@@ -1,0 +1,51 @@
+{
+  "paises": [
+    {
+      "id": 1,
+      "pais": "Mexico",
+      "capital": "Ciudad de Mexico"
+    },
+    {
+      "id": 2,
+      "pais": "Afganistan",
+      "capital": "Kabul"
+    },
+    {
+      "id": 3,
+      "pais": "Colombia",
+      "capital": "Bogota"
+    },
+    {
+      "id": 4,
+      "pais": "Argentina",
+      "capital": "Buenos Aires"
+    }
+  ],
+  "idiomas": [
+    {
+      "id": 1,
+      "idioma": "Español",
+      "de": "España"
+    },
+    {
+      "id": 2,
+      "idioma": "Ingles",
+      "de": "Estados Unidos"
+    },
+    {
+      "id": 3,
+      "idioma": "Portugues",
+      "de": "Brazil"
+    },
+    {
+      "id": 4,
+      "idioma": "Ruso",
+      "de": "Rusia"
+    },
+    {
+      "id": 5,
+      "idioma": "Chino mandarin",
+      "de": "China"
+    }
+  ]
+}

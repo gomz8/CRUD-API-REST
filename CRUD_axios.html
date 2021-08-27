@@ -2,17 +2,19 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>CRUD API REST AJAX</title>
+	<title>CRUD API REST AXIOS</title>
 </head>
 <body>
-	<h1>CRUD API REST AJAX</h1>
+	<h1>CRUD API REST AXIOS</h1>
 	<section class="crud">
 		<article>
-			<h2 class="crud-title">Agregar Santos</h2>
+			<h2 class="crud-title">Agregar País</h2>
 			<form class="crud-form">
-				<input type="text" name="pais" placeholder="pais" required="">
+				<input type="text" name="nombre" placeholder="Pais" required="">
 				<br>
-				<input type="text" name="ciudad" placeholder="ciudad" required="">
+				<br>
+				<input type="text" name="capital" placeholder="Capital" required="">
+				<br>
 				<br>
 				<input type="submit" name="Enviar">
 				<input type="hidden" name="id">
@@ -20,13 +22,13 @@
 		</article>
 
 		<article>
-			<h2>Ver santos</h2>
+			<h2>Ver Paises</h2>
 
 			<table class="crud-table">
 				<thead>
 					<tr>
 						<th>Pais</th>
-						<th>Ciudad</th>
+						<th>Capital</th>
 						<th>Acciones</th>
 					</tr>
 				</thead>
@@ -38,21 +40,147 @@
 
 	<template id="crud-template">
 		<tr>
-			<td>Mexico</td>
-			<td>Zacatecas</td>
+			<td class="nombre"></td>
+			<td class="capital"></td>
 			<td>
 				<button class="edit">Editar</button>
-				<button class="delite">Eliminar</button>
+				<button class="delete">Eliminar</button>
 			</td>
 		</tr>
 	</template>
+
+	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 	<script>
 		const d = document,
-			$table = d.querySelector(".crud.table"),
-			$form = d.querySelector(".crud.form"),
-			$title = d.querySelector(".crud.title"),
-			$template = d.getElementById(".crud.template").content,
+			$table = d.querySelector(".crud-table"),
+			$form = d.querySelector(".crud-form"),
+			$title = d.querySelector(".crud-title"),
+			$template = d.getElementById("crud-template").content,
 			$fragment = d.createDocumentFragment();
+
+		const getAll = async () => {
+			try{
+				let res = await axios.get("http://localhost:3000/paises"),
+					json = await res.data;
+					console.log(json);
+
+					json.forEach(el => {
+							$template.querySelector(".nombre").textContent = el.pais;
+							$template.querySelector(".capital").textContent = el.capital;
+							$template.querySelector(".edit").dataset.id = el.id;
+							$template.querySelector(".edit").dataset.nombre = el.pais;
+							$template.querySelector(".edit").dataset.capital = el.capital;
+							$template.querySelector(".delete").dataset.id = el.id;
+
+							let $clone = d.importNode($template, true);
+							$fragment.appendChild($clone);
+						});
+
+						$table.querySelector("tbody").appendChild($fragment);
+			}catch (err){
+				let message = err.statusText || "Ocurrio un error";
+				$table.insertAdjacentHTML("afterend", `<p><b>Error ${err.status}: ${message}</b><p>`);
+			}
+		}
+		
+		d.addEventListener("DOMContentLoaded", getAll);
+
+		d.addEventListener("submit", async e => {
+			if (e.target === $form) {
+				e.preventDefault();
+
+				if (!e.target.id.value) {
+				//CREATE - POST
+					try{
+						let options = {
+							method: "POST",
+								
+							headers: {
+								"Content-type": "application/json; charset=utf-8"
+							},
+						data: JSON.stringify({
+							pais: e.target.nombre.value,
+							capital: e.target.capital.value
+						})		
+					},
+						
+					res = await axios("http://localhost:3000/paises", options),
+					json = await res.data;
+
+					location.reload();
+
+					}catch (err){
+						console.log(err);
+						let message = err.statusText || "Ocurrio un error";
+						$form.insertAdjacentHTML("afterend", `<p><b>Error ${err.status}: ${message}</b></p>`);
+					}
+
+				}else{
+				//UPDATE - PUT
+					try{
+						let options = {
+							method: "PUT",
+								
+							headers: {
+								"Content-type": "application/json; charset=utf-8"
+							},
+						data: JSON.stringify({
+							pais: e.target.nombre.value,
+							capital: e.target.capital.value
+						})		
+					},
+						
+					res = await axios(`http://localhost:3000/paises/${e.target.id.value}`, options),
+					json = await res.data;
+
+					location.reload();
+
+					}catch (err){
+						console.log(err);
+						let message = err.statusText || "Ocurrio un error";
+						$form.insertAdjacentHTML("afterend", `<p><b>Error ${err.status}: ${message}</b></p>`);
+					}
+				}		
+			}
+		});
+
+		d.addEventListener("click", async e =>{
+			if (e.target.matches(".edit")) {
+				$title.textContent = "Editar País";
+          		$form.nombre.value = e.target.dataset.nombre;
+          		$form.capital.value = e.target.dataset.capital;
+          		$form.id.value = e.target.dataset.id;
+			}
+
+			if (e.target.matches(".delete")) {
+				let isDelete = confirm(`¿Estás seguro de eliminar el id ${e.target.dataset.id}?`);
+
+				if (isDelete) {
+					//DELETE - DELETE
+					try{
+						let options = {
+							method: "DELETE",
+								
+							headers: {
+								"Content-type": "application/json; charset=utf-8"
+							}	
+						},
+						
+						res = await axios(`http://localhost:3000/paises/${e.target.dataset.id}`, options),
+						json = await res.data;
+
+						location.reload();
+
+					}catch (err){
+						console.log(err);
+						let message = err.statusText || "Ocurrio un error";
+						alert(`Error ${err.status}: ${message}`);
+					}
+				}
+			}
+		});
+
 	</script>
 </body>
 </html>
